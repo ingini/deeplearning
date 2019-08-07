@@ -1,6 +1,11 @@
+import numpy as np
+np_load_old = np.load
+np.load = lambda *a, **k: np_load_old(*a, allow_pickle=True, **k)
+
 from keras.datasets import reuters
 (train_data, train_labels), (test_data, test_labels) = reuters.load_data(num_words=10000)
 
+np.load = np_load_old
 from keras.layers import Embedding
 from keras import preprocessing
 
