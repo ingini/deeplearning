@@ -1,0 +1,73 @@
+setwd("C:/Rstudy/프로젝트크롤링/wordcloud")
+getwd()
+
+
+#install.packages("KoNLP")
+#install.packages("wordcloud")
+#install.packages("RColorBrewer")
+#install.packages("wordcloud2")
+
+library(RColorBrewer)
+library(wordcloud)
+library(rJava) #rJAVa를 늦게켜기
+library(KoNLP)
+
+
+useSejongDic()
+
+#텍스트 읽기
+txtlines <- readLines("음악카페.csv")
+nouns <- sapply(txtlines, extractNoun, USE.NAMES=FALSE)
+
+undata<-unlist(nouns)
+wordcount<-table(undata)
+sort(wordcount, decreasing=T) #내림차순
+length(wordcount)
+
+#단어 솎아내기
+
+data<-Filter(function(x){nchar(x)>=2}, undata)
+
+#제외 gsub
+
+data<-gsub(" ","",data)
+data<-gsub("\\d+","",data) #숫자제외
+data<-gsub("\\(","",data) #괄호(제외 #지금 코드에서는 불필요하지만!
+data<-gsub("\\)","",data)
+data<-gsub("'","",data)
+data<-gsub(",","",data)
+data<-gsub('"',"",data)
+data<-gsub("and","",data)
+data<-gsub("of","",data)
+data<-gsub("to","",data)
+data<-gsub("in","",data)
+data<-gsub("the","",data)
+data<-gsub("팔","",data) #선팔언팔맞팔
+data<-gsub("[A-Za-z]","",data)
+data<-gsub("해요","",data)
+data<-gsub("[~!@#%^&*()_+=?<>]","",data)
+#data<-gsub("#","",data)
+data<-gsub("ㅋ","",data)
+
+#table형태로 변환한 wordcount1
+wordcount1 <- table(data)
+sort(wordcount1, decreasing=F)
+
+#write.table(wordcount, "C:/Rstudy/프로젝트크롤링/wordcloud/vrwordcloud.txt", sep=" ", row.names=FALSE, quote=FALSE, append=TRUE, na="NA")
+#write.csv(wordcount1,"vrwordcloud.csv") #파일로내보내기
+write.csv(wordcount1, "C:/Rstudy/프로젝트크롤링/wordcloud/123음악카페.csv")
+
+#워드클라우드 작성
+windows() #없어도ok
+windowsFonts(font=windowsFont("나눔스퀘어OTF"))
+
+pal=brewer.pal(8,"Dark2") #Paired, Dark2
+wordcloud(names(wordcount1), freq=wordcount1, scale=c(9,1), rot.per=0.25,
+          min.freq=10, random.order=F, random.color=T, family="font", colors=pal)
+
+
+#scale fontsize
+#rot.per 
+#min.freq 
+#
+
